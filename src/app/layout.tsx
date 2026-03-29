@@ -3,6 +3,7 @@ import { Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Audio Lab",
-  description: "Audio Lab cntbabul",
+  description: "Audio Lab by cntbabul",
 };
 
 export default function RootLayout({
@@ -31,19 +32,12 @@ export default function RootLayout({
     >
       <body className="h-full flex flex-col overflow-hidden scrollbar-hide bg-background">
         <ClerkProvider>
-          <header className="p-4 flex justify-end gap-4 shrink-0">
-            <Show when="signed-out">
-              <SignInButton mode="modal" />
-              <SignUpButton mode="modal" />
-            </Show>
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
-          </header>
-          <main className="flex-1 overflow-y-auto scrollbar-hide">
-            {children}
-          </main>
-          <Toaster />
+          <TooltipProvider>
+            <main className="flex-1 overflow-y-auto scrollbar-hide">
+              {children}
+            </main>
+            <Toaster />
+          </TooltipProvider>
         </ClerkProvider>
       </body>
     </html>

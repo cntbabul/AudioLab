@@ -22,7 +22,7 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  //for all proteted routes, ensure org is selected
+  //for all protected routes, ensure org is selected
   if (userId && !orgId) {
     const orgSelection = new URL("/org-selection", req.url);
     return NextResponse.redirect(orgSelection)
