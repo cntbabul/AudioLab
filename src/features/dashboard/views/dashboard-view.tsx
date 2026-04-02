@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/page-header";
-import { HeroPattern } from "../components/hero-patter";
+import { HeroPattern } from "../components/hero-pattern";
 import { DashboardHeader } from "../components/dashboard-header";
 import { TextInputPanel } from "@/components/text-input-panel";
 import { QuickActionsPanel } from "../components/quick-actions-panel";

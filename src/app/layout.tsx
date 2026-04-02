@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { TRPCReactProvider } from "@/trpc/client";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -16,7 +17,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Audio Lab",
+  title: {
+    default: "Audio Lab",
+    template: "%s | Audio Lab"
+  },
   description: "Audio Lab by cntbabul",
 };
 
@@ -32,12 +36,14 @@ export default function RootLayout({
     >
       <body className="h-full flex flex-col overflow-hidden scrollbar-hide bg-background">
         <ClerkProvider>
-          <TooltipProvider>
-            <main className="flex-1 overflow-y-auto scrollbar-hide">
-              {children}
-            </main>
-            <Toaster />
-          </TooltipProvider>
+          <TRPCReactProvider>
+            <TooltipProvider>
+              <main className="flex-1 overflow-y-auto scrollbar-hide">
+                {children}
+              </main>
+              <Toaster />
+            </TooltipProvider>
+          </TRPCReactProvider>
         </ClerkProvider>
       </body>
     </html>

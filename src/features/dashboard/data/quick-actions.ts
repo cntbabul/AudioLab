@@ -10,7 +10,7 @@ export const quickActions: QuickAction[] = [
         title: "Narrate a story",
         description: "Turn your story into an engaging audio experience",
         gradient: "from-cyan-600 to-blue-700",
-        href: "/text-to-speech?=In a village a tucked between mist-covered mountains, there lived an old clockmaker whose clocks never told the right time - but they always told the truth. One rainy evening, astranger walked in and asked for aclock that could show hime his future.",
+        href: "/text-to-speech?text=In a village tucked between mist-covered mountains, there lived an old clockmaker whose clocks never told the right time - but they always told the truth. One rainy evening, a stranger walked in and asked for a clock that could show him his future.",
     },
     {
         title: "Record an Ad",
