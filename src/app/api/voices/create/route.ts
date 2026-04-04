@@ -4,7 +4,7 @@ import { z } from "zod";
 import { polar } from "@/lib/polar";
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/db";
-import { uploadAudio } from "@/lib/r2";
+import { uploadAudio, deleteAudio } from "@/lib/r2";
 import { VOICE_CATEGORIES } from "@/features/voices/data/voice-categories";
 import type { VoiceCategory } from "@prisma/client";
 const createVoiceSchema = z.object({
@@ -114,6 +114,7 @@ export async function POST(request: Request) {
     }
 
     let createdVoiceId: string | null = null;
+    let uploadedR2Key: string | null = null;
 
     try {
         const voice = await prisma.voice.create({
@@ -139,6 +140,8 @@ export async function POST(request: Request) {
             contentType: normalizedContentType,
         });
 
+        uploadedR2Key = r2ObjectKey;
+
         await prisma.voice.update({
             where: {
                 id: voice.id,
@@ -147,7 +150,7 @@ export async function POST(request: Request) {
                 r2ObjectKey,
             },
         });
-    } catch {
+    } catch (error) {
         if (createdVoiceId) {
             await prisma.voice
                 .delete({
@@ -157,6 +160,16 @@ export async function POST(request: Request) {
                 })
                 .catch(() => { });
         }
+
+        if (uploadedR2Key) {
+            try {
+                await deleteAudio(uploadedR2Key);
+            } catch (cleanupError) {
+                console.error("Failed to cleanup orphaned R2 object:", cleanupError);
+            }
+        }
+
+        console.error("Voice creation failed:", error);
 
         return Response.json(
             { error: "Failed to create voice. Please retry." },

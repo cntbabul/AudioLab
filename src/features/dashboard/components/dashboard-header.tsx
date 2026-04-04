@@ -1,36 +1,16 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { useUser } from "@clerk/nextjs"
-import { Headphones, ThumbsUp } from "lucide-react"
-import Link from "next/link"
 
 export function DashboardHeader() {
     const { isLoaded, user } = useUser()
 
     return (
-        <div className="flex items-start justify-between">
-            <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Nice to see you</p>
-                <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight">
-                    {isLoaded ? (user?.fullName ?? user?.firstName ?? "there") : "..."}
-                </h1>
-            </div>
-            <div className="hidden lg:flex items-center gap-3">
-                <Button variant="outline" size="sm" asChild>
-                    <a href="mailto:cntbabul@gmail.com" className="flex items-center gap-2">
-                        <ThumbsUp className="h-4 w-4" />
-                        <span className="hidden lg:block">Feedback</span>
-                    </a>
-                </Button>
-                <Button variant="outline" size="sm" asChild>
-                    <a href="mailto:cntbabul@gmail.com" className="flex items-center gap-2">
-                        <Headphones className="h-4 w-4" />
-                        <span className="hidden lg:block">Need Help?</span>
-                    </a>
-                </Button>
-            </div>
-
+        <div className="flex flex-col gap-1">
+            <p className="text-sm font-medium text-muted-foreground/80 tracking-wide uppercase">Nice to see you</p>
+            <h1 className="text-3xl lg:text-5xl font-bold tracking-tight text-foreground">
+                {isLoaded ? (user?.fullName ?? user?.firstName ?? "there") : "..."}
+            </h1>
         </div>
     )
 

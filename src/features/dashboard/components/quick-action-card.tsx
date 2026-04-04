@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { QuickAction } from "@/features/dashboard/data/quick-actions";
-import { cn } from "@/utils/cn";
+import { cn } from "@/lib/utils";
 
 type QuickActionCardProps = QuickAction;
 

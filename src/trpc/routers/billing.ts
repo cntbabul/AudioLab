@@ -11,7 +11,7 @@ export const billingRouter = createTRPCRouter({
         const result = await polar.checkouts.create({
             products: [env.POLAR_PRODUCT_ID],
             externalCustomerId: ctx.orgId,
-            successUrl: process.env.APP_URL,
+            successUrl: `${env.APP_URL}/dashboard`,
         });
 
         if (!result.url) {
@@ -65,13 +65,18 @@ export const billingRouter = createTRPCRouter({
                 customerId: customerState.id,
                 estimatedCostCents,
             };
-        } catch {
-            // Customer doesn't exist yet in Polar
-            return {
-                hasActiveSubscription: false,
-                customerId: null,
-                estimatedCostCents: 0,
-            };
+        } catch (err: unknown) {
+            // Only return defaults if the customer doesn't exist yet in Polar
+            if (err instanceof Error && "statusCode" in err && err.statusCode === 404) {
+                return {
+                    hasActiveSubscription: false,
+                    customerId: null,
+                    estimatedCostCents: 0,
+                };
+            }
+
+            // Re-throw other errors (e.g. auth, network) to avoid misclassifying them
+            throw err;
         }
     }),
 });
