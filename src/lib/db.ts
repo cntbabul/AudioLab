@@ -17,9 +17,6 @@ if (globalForPrisma.prisma) {
         max: 10,
         idleTimeoutMillis: 10000,
         connectionTimeoutMillis: 30000,
-        ssl: {
-            rejectUnauthorized: false
-        }
     });
 
     pool.on('error', (err) => {

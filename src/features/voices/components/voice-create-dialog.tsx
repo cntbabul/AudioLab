@@ -1,22 +1,22 @@
 "use client";
 
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { VoiceCreateForm } from "./voice-create-form";
@@ -26,46 +26,77 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 
 interface VoiceCreateDialogProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
+  children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function VoiceCreateDialog({ open, onOpenChange }: VoiceCreateDialogProps) {
-    const isMobile = useIsMobile();
+export function VoiceCreateDialog({
+  children,
+  open,
+  onOpenChange,
+}: VoiceCreateDialogProps) {
+  const isMobile = useIsMobile();
 
-    if (isMobile) {
-        return (
-            <Drawer open={open} onOpenChange={onOpenChange}>
-                <DrawerContent>
-                    <DrawerHeader className="text-left">
-                        <DrawerTitle>Clone a voice</DrawerTitle>
-                        <DrawerDescription>
-                            Record or upload a high-quality audio sample to create a digital clone of your voice.
-                        </DrawerDescription>
-                    </DrawerHeader>
-                    <div className="px-4 pb-4">
-                        <VoiceCreateForm onSuccess={() => onOpenChange(false)} />
-                    </div>
-                </DrawerContent>
-            </Drawer>
-        );
-    }
+  const { checkout } = useCheckout();
 
+  const handleError = useCallback(
+    (message: string) => {
+      if (message === "SUBSCRIPTION_REQUIRED") {
+        toast.error("Subscription required", {
+          action: {
+            label: "Subscribe",
+            onClick: () => checkout(),
+          },
+        });
+      } else {
+        toast.error(message);
+      }
+    },
+    [checkout],
+  );
+
+  if (isMobile) {
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl overflow-hidden p-0">
-                <div className="flex flex-col h-[640px]">
-                    <DialogHeader className="p-6 pb-2">
-                        <DialogTitle>Clone a voice</DialogTitle>
-                        <DialogDescription>
-                            Record or upload a high-quality audio sample to create a digital clone of your voice.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-6 scrollbar-hide">
-                        <VoiceCreateForm onSuccess={() => onOpenChange(false)} />
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        {children && <DrawerTrigger asChild>{children}</DrawerTrigger>}
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Create custom voice</DrawerTitle>
+            <DrawerDescription>
+              Upload or record an audio sample to add a new voice to your
+              library.
+            </DrawerDescription>
+          </DrawerHeader>
+          <VoiceCreateForm
+            scrollable
+            onError={handleError}
+            footer={(submit) => (
+              <DrawerFooter>
+                {submit}
+                <DrawerClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            )}
+          />
+        </DrawerContent>
+      </Drawer>
     );
-}
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {children && <DialogTrigger asChild>{children}</DialogTrigger>}
+      <DialogContent>
+        <DialogHeader className="text-left">
+          <DialogTitle>Create custom voice</DialogTitle>
+          <DialogDescription>
+            Upload or record an audio sample to add a new voice to your library.
+          </DialogDescription>
+        </DialogHeader>
+        <VoiceCreateForm onError={handleError} />
+      </DialogContent>
+    </Dialog>
+  );
+};

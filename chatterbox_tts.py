@@ -40,6 +40,7 @@ app = modal.App("chatterbox-tts", image=image)
 
 with image.imports():
     import io
+    import logging
     import os
     from pathlib import Path
 
@@ -54,7 +55,9 @@ with image.imports():
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import StreamingResponse
     from fastapi.security import APIKeyHeader
-    from pydantic import BaseModel, Field
+    from pydantic import BaseModel, Field, field_validator
+
+    logger = logging.getLogger(__name__)
 
     api_key_scheme = APIKeyHeader(
         name="x-api-key",
@@ -78,6 +81,18 @@ with image.imports():
         top_k: int = Field(default=1000, ge=1, le=10000)
         repetition_penalty: float = Field(default=1.2, ge=1.0, le=2.0)
         norm_loudness: bool = Field(default=True)
+
+        @field_validator("voice_key")
+        @classmethod
+        def validate_voice_key(cls, v: str) -> str:
+            """Ensure voice_key is safe and doesn't allow path traversal."""
+            if ".." in v:
+                raise ValueError("Path traversal sequences ('..') are not allowed")
+            if "\0" in v:
+                raise ValueError("Null bytes are not allowed")
+            if v.startswith("/") or v.startswith("\\"):
+                raise ValueError("Leading path separators are not allowed")
+            return v
 
 
 @app.cls(
@@ -106,7 +121,7 @@ class Chatterbox:
         web_app.add_middleware(
             CORSMiddleware,
             allow_origins=["*"],
-            allow_credentials=True,
+            allow_credentials=False,
             allow_methods=["*"],
             allow_headers=["*"],
         )
@@ -138,10 +153,11 @@ class Chatterbox:
                     io.BytesIO(audio_bytes),
                     media_type="audio/wav",
                 )
-            except Exception as e:
+            except Exception:
+                logger.exception("Failed to generate audio")
                 raise HTTPException(
                     status_code=500,
-                    detail=f"Failed to generate audio: {e}",
+                    detail="Failed to generate audio",
                 )
 
         return web_app

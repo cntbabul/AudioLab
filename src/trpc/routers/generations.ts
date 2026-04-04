@@ -185,6 +185,16 @@ export const generationsRouter = createTRPCRouter({
                     });
                 } catch (dbError) {
                     console.error("Database or R2 error:", dbError);
+
+                    if (r2ObjectKey) {
+                        try {
+                            const { deleteAudio } = await import("@/lib/r2");
+                            await deleteAudio(r2ObjectKey);
+                        } catch (r2Error) {
+                            console.error("Failed to delete orphaned R2 object:", r2Error);
+                        }
+                    }
+
                     if (generationId) {
                         await prisma.generation
                             .delete({
@@ -221,9 +231,8 @@ export const generationsRouter = createTRPCRouter({
                             },
                         ],
                     })
-                    .catch((err) => {
+                    .catch((err: unknown) => {
                         console.error("Polar event ingest error:", err);
-                        // Silently fail - don't break the user experience for metering errors
                     });
 
                 return {

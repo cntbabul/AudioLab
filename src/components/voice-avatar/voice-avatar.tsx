@@ -5,7 +5,7 @@ import {
     AvatarFallback,
     AvatarImage
 } from "@/components/ui/avatar";
-import { cn } from "@/utils/cn";
+import { cn } from "@/lib/utils";
 import { useVoiceAvatar } from "./use-voice-avatar";
 
 interface VoiceAvatarProps {

@@ -11,7 +11,7 @@ import superjson from "superjson";
 
 export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>();
 
-let browserQueryClient: QueryClient;
+let browserQueryClient: QueryClient | undefined;
 
 function getQueryClient() {
     if (typeof window === 'undefined') {
