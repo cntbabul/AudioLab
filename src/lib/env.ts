@@ -19,5 +19,5 @@ export const env = createEnv({
     CHATTERBOX_API_KEY: z.string().min(1),
   },
   experimental__runtimeEnv: {},
-  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
+  skipValidation: !!process.env.SKIP_ENV_VALIDATION || !!process.env.VERCEL,
 });
