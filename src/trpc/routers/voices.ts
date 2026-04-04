@@ -5,14 +5,9 @@ import { createTRPCRouter, orgProcedure } from "../init";
 
 export const voicesRouter = createTRPCRouter({
     getAll: orgProcedure
-        .input(
-            z
-                .object({
-                    query: z.string().trim().optional(),
-                })
-                .optional(),
-        )
+        .input(z.object({ query: z.string().trim().optional() }).optional())
         .query(async ({ ctx, input }) => {
+            console.log("[voices.getAll] Starting query", { orgId: ctx.orgId });
             const searchFilter = input?.query
                 ? {
                     OR: [
@@ -31,8 +26,8 @@ export const voicesRouter = createTRPCRouter({
                 }
                 : {};
 
-            const [custom, system] = await Promise.all([
-                prisma.voice.findMany({
+            try {
+                const custom = await prisma.voice.findMany({
                     where: {
                         variant: "CUSTOM",
                         orgId: ctx.orgId,
@@ -47,8 +42,9 @@ export const voicesRouter = createTRPCRouter({
                         language: true,
                         variant: true,
                     },
-                }),
-                prisma.voice.findMany({
+                });
+
+                const system = await prisma.voice.findMany({
                     where: {
                         variant: "SYSTEM",
                         ...searchFilter,
@@ -62,10 +58,17 @@ export const voicesRouter = createTRPCRouter({
                         language: true,
                         variant: true,
                     },
-                }),
-            ]);
+                });
 
-            return { custom, system };
+                console.log("[voices.getAll] Query successful", {
+                    customCount: custom.length,
+                    systemCount: system.length,
+                });
+                return { custom, system };
+            } catch (err) {
+                console.error("[voices.getAll] Query failed:", err);
+                throw err;
+            }
         }),
 
     delete: orgProcedure

@@ -33,7 +33,7 @@ export function VoiceSelectorButton() {
                     <VoiceAvatar
                         seed={currentVoice.id}
                         name={currentVoice.name}
-                        className="size-6"
+                        className="size-5"
                     />
                 )}
                 <span className="flex-1 truncate text-left text-sm font-medium">

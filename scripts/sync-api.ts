@@ -26,7 +26,7 @@ async function main() {
     process.exit(1);
   }
 
-  const openApiUrl = `${apiUrl}/openapi.json`;
+  const openApiUrl = new URL("openapi.json", apiUrl.endsWith("/") ? apiUrl : `${apiUrl}/`).toString();
   console.log(`Fetching OpenAPI spec from: ${openApiUrl}`);
 
   const ast = await openapiTS(new URL(openApiUrl));
